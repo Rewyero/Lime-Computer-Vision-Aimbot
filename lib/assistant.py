@@ -1,12 +1,12 @@
 
 import ctypes
-from time import sleep
+import random
 import win32api
-import win32con
 import pynput
-import pyautogui
 
-recoil_speed = 3
+min_vertical = 1
+max_vertical = 13
+offset_const = 1000
 
 PUL = ctypes.POINTER(ctypes.c_ulong)
 
@@ -57,8 +57,7 @@ def PressKey(hexKeyCode):
 def ReleaseKey(hexKeyCode):
     extra = ctypes.c_ulong(0)
     ii_ = Input_I()
-    ii_.ki = KeyBdInput(0, hexKeyCode, 0x0008 | 0x0002, 0,
-                        ctypes.pointer(extra))
+    ii_.ki = KeyBdInput(0, hexKeyCode, 0x0008 | 0x0002, 0, ctypes.pointer(extra))
     x = Input(ctypes.c_ulong(1), ii_)
     ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
 
@@ -69,25 +68,28 @@ def auto_ping(enabled):
         PressKey(LEFT_ALT)
         ReleaseKey(LEFT_ALT)
 
-# RECOIL
-def activate_aim(is_aim, inpt_device, tx, ty, screenwidth, screenheight):
-    if inpt_device == '1':
-        m_left = win32api.GetKeyState(0x01)
-        m_right = win32api.GetKeyState(0x02)
+def activate_recoil():
+    m_left = win32api.GetKeyState(0x01)
+    m_right = win32api.GetKeyState(0x02)
+    if m_left < 0 and m_right < 0:
+        #auto_ping(enabled=True)
+        vertical_offset = random.randrange(min_vertical * offset_const, max_vertical * offset_const, 1) / offset_const
+        # Move the mouse with these offsets
+        win32api.mouse_event(0x0001, int(0), int(vertical_offset))
 
+# RECOIL
+def activate_aim(is_aim, inpt_device, tx, ty):
+    m_right = win32api.GetKeyState(0x02)
+
+    if inpt_device == "Mouse":
         if m_right < 0 and is_aim:
             # Move the mouse with these offsets
-            #print(tx, ty)
             extra = ctypes.c_ulong(0)
             ii_ = pynput._util.win32.INPUT_union()
-            ii_.mi = pynput._util.win32.MOUSEINPUT(tx, ty, 0, (0x0001 | 0x8000), 0, ctypes.cast(ctypes.pointer(extra), ctypes.c_void_p))
-            command=pynput._util.win32.INPUT(ctypes.c_ulong(0), ii_)
+            ii_.mi = pynput._util.win32.MOUSEINPUT(tx, ty, 0, (0x0001), 0, ctypes.cast(ctypes.pointer(extra), ctypes.c_void_p))
+            command = pynput._util.win32.INPUT(ctypes.c_ulong(0), ii_)
             SendInput(1, ctypes.pointer(command), ctypes.sizeof(command))
-            #win32api.mouse_event(win32con.MOUSEEVENTF_MOVE | win32con.MOUSEEVENTF_ABSOLUTE,
-               # tx, ty, 0, 0)
-    elif inpt_device == '2':
+            
+    elif inpt_device == "Controller":
         # TODO CONTROLLER INPUT
             auto_ping()
-    else:
-        inpt_device = "1"
-        print("Device set to Default 1 = Mouse")

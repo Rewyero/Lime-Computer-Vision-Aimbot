@@ -1,4 +1,3 @@
-
 import numpy as np
 import win32gui, win32ui, win32con, win32api
 
@@ -34,4 +33,4 @@ def grab(region=None):
     win32gui.ReleaseDC(hwin, hwindc)
     win32gui.DeleteObject(bmp.GetHandle())
 
-    return img #cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
+    return img #cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
