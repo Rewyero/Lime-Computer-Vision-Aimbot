@@ -11,10 +11,10 @@ from lib.assistant import activate_aim, activate_recoil
 
 # Load Model
 print(colored(".....Loading AI Model......", "yellow"))
-model =  torch.hub.load('ultralytics/yolov5', 'custom', path='lib/models/warzone5s.pt', force_reload=True)
+model =  torch.hub.load('ultralytics/yolov5', 'custom', path='lib/models/best.pt', force_reload=True)
 
-vision_width = 500 # 500
-vision_heigth = 300 # 280
+vision_width = 800 # 500
+vision_heigth = 600 # 280
 
 def check_input_device(input_device):
     if input_device == 1:
@@ -59,8 +59,8 @@ def run_detection(show_window, aim_assist, inpt_device):
         # check if any object detected
         if len(targets_detected) > 0:
             for xmin, ymin, xmax, ymax, confidence, classid in targets_detected:
-                #Classid: 15 = Teammate, 16 = Target, 17 = Enemy
-                if confidence > 0.68 and classid == 16 or classid == 17:
+                #Classid: 15 = Operator, 16 = Head
+                if confidence > 0.78: # classid == 17 or classid == 19
                     cx, cy = check_classid(xmin,ymin, xmax,ymax, classid)
                     nearest_points = get_detected_points(cx,cy)
                     
@@ -84,10 +84,10 @@ def run_detection(show_window, aim_assist, inpt_device):
             break
 
 def check_classid(xmin, ymin, xmax, ymax, classid):
-    if classid == 16: # Target
-        heigth_boxes_calculation = 0.4
-    elif classid == 17: # Enemy
-        heigth_boxes_calculation = 0.6
+    if classid == 15: # Operator
+       heigth_boxes_calculation = 0.4
+    elif classid == 16: # Head
+        heigth_boxes_calculation = 0.5
 
     cx = int((xmin+xmax) / 2)
     cy = int((ymin+ymax - (ymax - ymin) * heigth_boxes_calculation) / 2)
