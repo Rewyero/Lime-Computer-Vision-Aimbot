@@ -4,8 +4,8 @@ Hello, this is my hobby Project to create an Aimbot Computer Vision with yolov5.
 
 ## AI Training Results
 
-![App Screenshot](https://github.com/Rewyero/Lime-Computer-Vision-Aimbot/blob/master/img/results.png)
-![App Screenshot](https://github.com/Rewyero/Lime-Computer-Vision-Aimbot/blob/master/img/val_batch2_labels.png)
+![Results Graph](https://github.com/Rewyero/Lime-Computer-Vision-Aimbot/blob/master/img/results.png)
+![Results Labels](https://github.com/Rewyero/Lime-Computer-Vision-Aimbot/blob/master/img/val_batch2_labels.jpg)
 
 ## Installation
 ### (Testet With RTX 2080 Super) CV DETECTION WITH 30 - 50 FPS
