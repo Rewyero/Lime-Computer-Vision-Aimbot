@@ -1,2 +1,6 @@
 lib/models/best.pt
 lib/models/warzone5s.pt
+lib/__pycache__/assistant.cpython-38.pyc
+lib/__pycache__/detection.cpython-38.pyc
+lib/__pycache__/grab_screen.cpython-38.pyc
+.gitignore

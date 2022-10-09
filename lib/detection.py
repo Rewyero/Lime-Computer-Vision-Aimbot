@@ -13,8 +13,8 @@ from lib.assistant import activate_aim, activate_recoil
 print(colored(".....Loading AI Model......", "yellow"))
 model =  torch.hub.load('ultralytics/yolov5', 'custom', path='lib/models/best.pt', force_reload=True)
 
-vision_width = 800 # 500
-vision_heigth = 600 # 280
+vision_width = 500 # 500
+vision_heigth = 280 # 280
 
 def check_input_device(input_device):
     if input_device == 1:
@@ -60,7 +60,7 @@ def run_detection(show_window, aim_assist, inpt_device):
         if len(targets_detected) > 0:
             for xmin, ymin, xmax, ymax, confidence, classid in targets_detected:
                 #Classid: 15 = Operator, 16 = Head
-                if confidence > 0.78: # classid == 17 or classid == 19
+                if confidence < 0.7 and classid == 15 or confidence > 0.71 and classid == 16:
                     cx, cy = check_classid(xmin,ymin, xmax,ymax, classid)
                     nearest_points = get_detected_points(cx,cy)
                     
@@ -85,9 +85,9 @@ def run_detection(show_window, aim_assist, inpt_device):
 
 def check_classid(xmin, ymin, xmax, ymax, classid):
     if classid == 15: # Operator
-       heigth_boxes_calculation = 0.4
+        heigth_boxes_calculation = 0.8
     elif classid == 16: # Head
-        heigth_boxes_calculation = 0.5
+        heigth_boxes_calculation = 0.1
 
     cx = int((xmin+xmax) / 2)
     cy = int((ymin+ymax - (ymax - ymin) * heigth_boxes_calculation) / 2)

@@ -4,8 +4,8 @@ import random
 import win32api
 import pynput
 
-min_vertical = 1
-max_vertical = 13
+min_vertical = 2
+max_vertical = 15
 offset_const = 1000
 
 PUL = ctypes.POINTER(ctypes.c_ulong)
@@ -71,18 +71,20 @@ def auto_ping(enabled):
 def activate_recoil():
     m_left = win32api.GetKeyState(0x01)
     m_right = win32api.GetKeyState(0x02)
-    if m_left < 0 and m_right < 0:
+    if m_left < 0 and m_right < 0 :
         #auto_ping(enabled=True)
         vertical_offset = random.randrange(min_vertical * offset_const, max_vertical * offset_const, 1) / offset_const
         # Move the mouse with these offsets
         win32api.mouse_event(0x0001, int(0), int(vertical_offset))
 
+
 # RECOIL
 def activate_aim(is_aim, inpt_device, tx, ty):
     m_right = win32api.GetKeyState(0x02)
+    mouse_posX, mouse_posY = win32api.GetCursorPos()
 
-    if inpt_device == "Mouse":
-        if m_right < 0 and is_aim:
+    if inpt_device == "Mouse" and is_aim:
+        if m_right < 0 and mouse_posX != tx and mouse_posY != ty:
             # Move the mouse with these offsets
             extra = ctypes.c_ulong(0)
             ii_ = pynput._util.win32.INPUT_union()
@@ -90,6 +92,6 @@ def activate_aim(is_aim, inpt_device, tx, ty):
             command = pynput._util.win32.INPUT(ctypes.c_ulong(0), ii_)
             SendInput(1, ctypes.pointer(command), ctypes.sizeof(command))
             
-    elif inpt_device == "Controller":
+    #elif inpt_device == "Controller":
         # TODO CONTROLLER INPUT
-            auto_ping()
+            #auto_ping()
