@@ -80,17 +80,20 @@ def activate_recoil():
 
 # RECOIL
 def activate_aim(is_aim, inpt_device, tx, ty):
+    m_left = win32api.GetKeyState(0x01)
     m_right = win32api.GetKeyState(0x02)
     mouse_posX, mouse_posY = win32api.GetCursorPos()
 
     if inpt_device == "Mouse" and is_aim:
-        if m_right < 0 and mouse_posX != tx and mouse_posY != ty:
+        if  m_right < 0 and mouse_posX != tx and mouse_posY != ty: #m_left < 0 and
             # Move the mouse with these offsets
             extra = ctypes.c_ulong(0)
             ii_ = pynput._util.win32.INPUT_union()
             ii_.mi = pynput._util.win32.MOUSEINPUT(tx, ty, 0, (0x0001), 0, ctypes.cast(ctypes.pointer(extra), ctypes.c_void_p))
             command = pynput._util.win32.INPUT(ctypes.c_ulong(0), ii_)
             SendInput(1, ctypes.pointer(command), ctypes.sizeof(command))
+            
+            
             
     #elif inpt_device == "Controller":
         # TODO CONTROLLER INPUT

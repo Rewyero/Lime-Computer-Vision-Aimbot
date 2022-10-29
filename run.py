@@ -19,7 +19,7 @@ aim_assist = True # Aim Assist Enable = True || Disabled = False
 computerVision_show_window = True # Show Computer Vision Window (True)
 input_device = 1 # (1  Mouse/Keyboard) ( 2 Controller)
 
-# Start Screen Capture
+# Start Detection
 detection.run_detection(
 computerVision_show_window, 
 aim_assist, 
