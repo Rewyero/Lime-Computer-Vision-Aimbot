@@ -1,2 +1,2 @@
 @echo off
-"python.exe" "run.py"
+"python.exe" "lib/detection.py"

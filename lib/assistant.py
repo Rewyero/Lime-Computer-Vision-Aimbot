@@ -4,8 +4,8 @@ import random
 import win32api
 import pynput
 
-min_vertical = 2
-max_vertical = 15
+min_vertical = 1
+max_vertical = 10
 offset_const = 1000
 
 PUL = ctypes.POINTER(ctypes.c_ulong)
