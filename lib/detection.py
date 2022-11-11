@@ -14,10 +14,10 @@ aim_assist = True # Aim Assist Enable = True || Disabled = False
 show_window = True # Show Computer Vision Window (True)
 input_device = 1 # (1  Mouse/Keyboard) ( 2 Controller)
 
-vision_width = 300 # 500
-vision_heigth = 280 # 280
+vision_width = 400 # 500
+vision_heigth = 300 # 280
 
-aim_speed = 1
+aim_speed = 4
 
 def GRAB_SCREEN(q):
     # Calculate the Range for Detection Window
@@ -28,8 +28,9 @@ def GRAB_SCREEN(q):
 
     while True:
         img_screen = np.array(grab_screen.grab(vision_window_size))
-        q.put_nowait(img_screen)
+        q.put(img_screen)
         q.join()
+        activate_recoil()
 
 def run_detection(q):
 
@@ -41,10 +42,9 @@ def run_detection(q):
 
     while True:
         if not q.empty():
-            start_time = timeit.default_timer()
+
             # grab screen capture
-            #img_screen = np.array(grab_screen.grab(vision_window_size))
-            img_screen = q.get_nowait()
+            img_screen = q.get()
             q.task_done()
 
             # Detection
@@ -56,7 +56,7 @@ def run_detection(q):
             if len(targets_detected) > 0:
                 for xmin, ymin, xmax, ymax, confidance, classid in targets_detected:
                     #Classid: 15 = Operator, 16 = Head
-                    if confidance > 0.4 and classid == 16:
+                    if confidance > 0.5 and classid == 16:
                         cx, cy = head_pos_calculation(xmin, ymin, xmax, ymax, classid)
                         crosshair_dist = int(math.dist((cx, cy), (vision_width / 2, vision_heigth / 2)))
                         detected_points.append((cx,cy, crosshair_dist))
@@ -68,20 +68,25 @@ def run_detection(q):
                 mouse_x = int((xpos - (vision_width / 2)) * aim_speed)
                 mouse_y = int((ypos - (vision_heigth / 2)) * aim_speed)
                 activate_aim(is_aim=aim_assist, inpt_device="Mouse", tx=mouse_x, ty=mouse_y)
-
-            #activate_recoil() 
-
-            if show_window == True:
-                # Calc and Print FPS
-                cv2.putText(img_screen, f"FPS: {int(1/(time.perf_counter() - start_time))}",
-                        (3, 20), cv2.FONT_HERSHEY_DUPLEX, 0.5, (200, 00, 255), 1)
-                        
-                cv2.imshow('Lime Computer Vision', img_screen)
-
-            if cv2.waitKey(1) == ord('q'):
+            q.put(img_screen)
+            q.join()
+            
+def SHOW_SCREEN_WINDOW(q):
+    global fps, start_time
+    while True:
+        if not q.empty():
+            start_time = timeit.default_timer()
+            img = q.get()
+            q.task_done()
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            # Calc and Print FPS
+            cv2.putText(img, f"FPS: {int(1/(time.perf_counter() - start_time))}",
+                    (3, 20), cv2.FONT_HERSHEY_DUPLEX, 0.5, (200, 00, 255), 1)
+            cv2.imshow("Lime Computer Vision", img)
+        
+        if cv2.waitKey(1) == ord('q'):
                 cv2.destroyAllWindows()
                 break
-            
 
 def head_pos_calculation(xmin, ymin, xmax, ymax, classid):
 
@@ -91,7 +96,6 @@ def head_pos_calculation(xmin, ymin, xmax, ymax, classid):
         heigth_boxes_calculation = 0.1
 
     cx = int((xmin+xmax) / 2)
-    #cy = int((ymin+ymax) / 2)
     cy = int((ymin+ymax - (ymax - ymin) * heigth_boxes_calculation) / 2)
     return cx,cy
 
@@ -119,6 +123,10 @@ if __name__ == "__main__":
 
     
     p1 = multiprocessing.Process(target=GRAB_SCREEN, args=(q, ))
-    p2 = multiprocessing.Process(target=run_detection, args=(q, ))
+    p2 = multiprocessing.Process(target=SHOW_SCREEN_WINDOW, args=(q, ))
+    p3 = multiprocessing.Process(target=run_detection, args=(q, ))
     p1.start()
-    p2.start()
+    if show_window:
+        p2.start()
+
+    p3.start()

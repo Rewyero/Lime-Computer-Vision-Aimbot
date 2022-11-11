@@ -3,6 +3,7 @@ import ctypes
 import random
 import win32api
 import pynput
+import time
 
 min_vertical = 1
 max_vertical = 10
@@ -76,11 +77,12 @@ def activate_recoil():
         vertical_offset = random.randrange(min_vertical * offset_const, max_vertical * offset_const, 1) / offset_const
         # Move the mouse with these offsets
         win32api.mouse_event(0x0001, int(0), int(vertical_offset))
+        
 
 
 # RECOIL
 def activate_aim(is_aim, inpt_device, tx, ty):
-    m_left = win32api.GetKeyState(0x01)
+    #m_left = win32api.GetKeyState(0x01)
     m_right = win32api.GetKeyState(0x02)
     mouse_posX, mouse_posY = win32api.GetCursorPos()
 
@@ -92,6 +94,8 @@ def activate_aim(is_aim, inpt_device, tx, ty):
             ii_.mi = pynput._util.win32.MOUSEINPUT(tx, ty, 0, (0x0001), 0, ctypes.cast(ctypes.pointer(extra), ctypes.c_void_p))
             command = pynput._util.win32.INPUT(ctypes.c_ulong(0), ii_)
             SendInput(1, ctypes.pointer(command), ctypes.sizeof(command))
+            time.sleep(1)
+            
             
             
             
