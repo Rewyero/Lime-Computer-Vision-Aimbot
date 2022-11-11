@@ -11,7 +11,7 @@ from win32api import GetSystemMetrics
 from assistant import activate_aim, activate_recoil
 
 aim_assist = True # Aim Assist Enable = True || Disabled = False
-show_window = True # Show Computer Vision Window (True)
+show_window = False # Show Computer Vision Window (True)
 input_device = 1 # (1  Mouse/Keyboard) ( 2 Controller)
 
 vision_width = 400 # 500
@@ -82,7 +82,8 @@ def SHOW_SCREEN_WINDOW(q):
             # Calc and Print FPS
             cv2.putText(img, f"FPS: {int(1/(time.perf_counter() - start_time))}",
                     (3, 20), cv2.FONT_HERSHEY_DUPLEX, 0.5, (200, 00, 255), 1)
-            cv2.imshow("Lime Computer Vision", img)
+            if show_window:
+                cv2.imshow("Lime Computer Vision", img)
         
         if cv2.waitKey(1) == ord('q'):
                 cv2.destroyAllWindows()
@@ -126,7 +127,5 @@ if __name__ == "__main__":
     p2 = multiprocessing.Process(target=SHOW_SCREEN_WINDOW, args=(q, ))
     p3 = multiprocessing.Process(target=run_detection, args=(q, ))
     p1.start()
-    if show_window:
-        p2.start()
-
+    p2.start()
     p3.start()
